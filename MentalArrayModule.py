@@ -16,31 +16,83 @@ class MentalArrayModule:
     AMOUNT_OF_FIRING_EVENTS = 10
 
     def __init__(self):
-        self.objects = {}
+        self.objects = []
+        self.spatial_array = numpy.empty([self.SIZE, self.SIZE], dtype=object) 
         
     def insert_proposition(self, relation, object1, object2):
         if self.objects.__contains__(object1) and not self.objects.__contains__(object2):
-            self.objects[object2] = numpy.zeros((self.SIZE, self.SIZE))
-            self.fill_probability_map_by_lxr_units(relation, object1, object2, False)
+            self.objects.append(object2)
+            self.add_object_by_lxr_units(relation, object1, object2, False)
         elif self.objects.__contains__(object2) and not self.objects.__contains__(object1):
-            self.objects[object1] = numpy.zeros((self.SIZE, self.SIZE))
-            self.fill_probability_map_by_lxr_units(relation, object2, object1, True)
+            self.objects.append(object1)
+            self.add_object_by_lxr_units(relation, object2, object1, True)
         else:
-            self.objects[object1] = numpy.zeros((self.SIZE, self.SIZE))
-            self.objects[object2] = numpy.zeros((self.SIZE, self.SIZE))
-            self.fill_probability_map_for_new_object(relation, object1, True)
-            self.fill_probability_map_for_new_object(relation, object2, False)
+            self.objects.append(object1)
+            self.objects.append(object2)
+            self.fill_spatial_array_with_new_object(relation, object1, True)
+            self.fill_spatial_array_with_new_object(relation, object2, False)
 
-    def fill_probability_map_by_lxr_units(self, relation, reference_object, object_to_add, is_agent):
-        reference_object_probability_map = self.objects[reference_object]
-        object_to_add_probability_map =  self.objects[object_to_add]
-        print(object_to_add_probability_map)
-        for j, row in enumerate(reference_object_probability_map):
-            for i, value in enumerate(row):
-                if is_agent:
-                    object_to_add_probability_map.itemset((j,i), reference_object_probability_map.item((self.find_min_and_max_limit(j, relation.agent_y_lxr_units), self.find_min_and_max_limit(i , relation.agent_x_lxr_units))))
-                else:
-                    object_to_add_probability_map.itemset((j,i), reference_object_probability_map.item((self.find_min_and_max_limit(j, relation.referent_y_lxr_units), self.find_min_and_max_limit(i , relation.referent_x_lxr_units))))
+    def add_object_by_lxr_units(self, relation, reference_object, object_to_add, is_agent):
+        itemindex = numpy.where(self.spatial_array==reference_object)
+        new_index_y = itemindex[0][0]
+        new_index_x = itemindex[1][0]
+        if is_agent:
+            new_index_y = self.find_min_and_max_limit(new_index_y, relation.agent_y_lxr_units)
+            new_index_x = self.find_min_and_max_limit(new_index_x , relation.agent_x_lxr_units)
+        else:
+            new_index_y = self.find_min_and_max_limit(new_index_y, relation.referent_y_lxr_units)
+            new_index_x = self.find_min_and_max_limit(new_index_x, relation.referent_x_lxr_units)
+        next_item = self.spatial_array.item((new_index_y, new_index_x))
+        print(next_item)
+        if next_item is not None:
+            self.add_object_to_next_empty_cell(new_index_y, new_index_x, relation, object_to_add, is_agent)
+        else:
+            self.spatial_array.itemset((new_index_y, new_index_x), object_to_add)
+
+    def add_object_to_next_empty_cell(self, index_x, index_y, relation, object_to_add, is_agent):
+        new_index_y = index_y
+        new_index_x = index_x
+        x_direction = 0
+        y_direction = 0
+        if is_agent:
+            if relation.agent_y_lxr_units > 0:
+                y_direction = 1
+            elif relation.agent_y_lxr_units == 0:
+                y_direction = 0
+            else:
+                y_direction = -1
+            if relation.agent_x_lxr_units > 0:
+                x_direction = 1
+            elif relation.agent_x_lxr_units == 0:
+                x_direction = 0
+            else:
+                x_direction = -1
+        else:
+            if relation.referent_y_lxr_units > 0:
+                y_direction = 1
+            elif relation.referent_y_lxr_units == 0:
+                y_direction = 0
+            else:
+                y_direction = -1
+            if relation.referent_x_lxr_units > 0:
+                x_direction = 1
+            elif relation.referent_x_lxr_units == 0:
+                x_direction = 0
+            else:
+                x_direction = -1
+
+        next_item = ""
+        while next_item is not None:
+            next_new_index_y = self.find_min_and_max_limit(new_index_y, y_direction)
+            next_new_index_x = self.find_min_and_max_limit(new_index_x , x_direction)
+            if next_new_index_x == new_index_x and next_new_index_y == new_index_y:
+                print("No empty cell found")
+                return
+            new_index_y = next_new_index_y
+            new_index_x = next_new_index_x
+            next_item = self.spatial_array.item((new_index_y, new_index_x))
+        self.spatial_array.itemset((new_index_y, new_index_x), object_to_add)
+
 
     def find_min_and_max_limit(self, index, index_to_add):
         if index + index_to_add >= self.SIZE:
@@ -51,40 +103,44 @@ class MentalArrayModule:
             return index + index_to_add
         
 
-    def fill_probability_map_for_new_object(self, relation, object_to_map, is_agent):
+    def fill_spatial_array_with_new_object(self, relation, object_to_map, is_agent):
         print(type(relation).__name__)
         if type(relation).__name__ == Relation.North.name:
-            for location in range(self.SIZE):
-                self.objects[object_to_map][self.SIZE-1 - location][4] = self.calculate_probability(location, self.HIGH_AGENT_MEAN, is_agent)
+            location = self.calculate_probability(self.HIGH_AGENT_MEAN, is_agent)
+            self.spatial_array.itemset((self.SIZE-1 - location,4),object_to_map)
         elif type(relation).__name__ == Relation.South.name:
-            for location in range(self.SIZE):
-                self.objects[object_to_map][self.SIZE-1 - location][4] = self.calculate_probability(location, self.LOW_AGENT_MEAN, is_agent)      
+            location = self.calculate_probability(self.LOW_AGENT_MEAN, is_agent)
+            self.spatial_array[self.SIZE-1 - location][4] = object_to_map     
         elif type(relation).__name__ == Relation.West.name:  
-            for location in range(self.SIZE):
-                self.objects[object_to_map][4][location] = self.calculate_probability(location, self.LOW_AGENT_MEAN, is_agent)
+            location = self.calculate_probability(self.LOW_AGENT_MEAN, is_agent)
+            self.spatial_array[4][location] = object_to_map
         elif type(relation).__name__ == Relation.East.name:  
-            for location in range(self.SIZE):
-                self.objects[object_to_map][4][location] = self.calculate_probability(location, self.HIGH_AGENT_MEAN, is_agent)    
-        elif type(relation).__name__ == Relation.NorthWest.name:  
-            for location in range(self.SIZE):
-                self.objects[object_to_map][self.SIZE-1 - location][self.SIZE-1 - location] = self.calculate_probability(location, self.HIGH_AGENT_MEAN, is_agent)
-        elif type(relation).__name__ == Relation.NorthEast.name:  
-            for location in range(self.SIZE):
-                self.objects[object_to_map][self.SIZE-1 - location][location] = self.calculate_probability(location, self.HIGH_AGENT_MEAN, is_agent)
+            location = self.calculate_probability(self.HIGH_AGENT_MEAN, is_agent)
+            self.spatial_array[4][location] = object_to_map 
+        elif type(relation).__name__ == Relation.NorthWest.name: 
+            location = self.calculate_probability(self.HIGH_AGENT_MEAN, is_agent)
+            self.spatial_array[self.SIZE-1 - location][self.SIZE-1 - location] = object_to_map 
+        elif type(relation).__name__ == Relation.NorthEast.name: 
+            location = self.calculate_probability(self.HIGH_AGENT_MEAN, is_agent)
+            self.spatial_array[self.SIZE-1 - location][location] = object_to_map 
         elif type(relation).__name__ == Relation.SouthWest.name:  
-            for location in range(self.SIZE):
-                self.objects[object_to_map][self.SIZE-1 - location][location] = self.calculate_probability(location, self.LOW_AGENT_MEAN, is_agent)
+            location = self.calculate_probability(self.LOW_AGENT_MEAN, is_agent)
+            self.spatial_array[self.SIZE-1 - location][location] = object_to_map 
         elif type(relation).__name__ == Relation.SouthEast.name: 
-            for location in range(self.SIZE):
-                self.objects[object_to_map][self.SIZE-1 - location][self.SIZE-1 - location] = self.calculate_probability(location, self.LOW_AGENT_MEAN, is_agent)
+            location = self.calculate_probability(self.LOW_AGENT_MEAN, is_agent)
+            self.spatial_array[self.SIZE-1 - location][self.SIZE-1 - location] = object_to_map 
         else:
             print("UNKNONW_RELATION")
 
-    def calculate_probability(self, location, agent_mean, is_agent):
+    def calculate_probability(self, agent_mean, is_agent):
         if is_agent:
-            return round(norm.pdf(location, agent_mean, self.STANDARD_VARIATION),3)
+            x = numpy.random.normal(agent_mean, self.STANDARD_VARIATION, self.AMOUNT_OF_FIRING_EVENTS)
+            mean = numpy.mean(x)
+            return int(round(mean))
         else:
-            return round(norm.pdf(location, self.REFERENT_MEAN, self.STANDARD_VARIATION),3)
+            x = numpy.random.normal(self.REFERENT_MEAN, self.STANDARD_VARIATION, self.AMOUNT_OF_FIRING_EVENTS)
+            mean = numpy.mean(x)
+            return int(round(mean))
 
 
     def print_all(self):
