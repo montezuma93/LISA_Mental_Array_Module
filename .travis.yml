@@ -12,7 +12,7 @@ addons:
   sonarcloud:
     organization: "montezuma93-github" # the key of the org you chose at step #3
     token:
-      secure: "6d0ff832ee5d97268bf61f151dfa6dc1957b3dac" # encrypted value of your token
+      secure: "adfa280c3ad105eb6ee90a331610f38d9315b3cc" # encrypted value of your token
 after_success: coverage report
 # command to run tests
 script:
