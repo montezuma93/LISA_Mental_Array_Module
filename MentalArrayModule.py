@@ -112,17 +112,7 @@ class MentalArrayModule:
             return index + index_to_add
 
     def fill_spatial_array_with_new_object(self, relation, object_to_map, is_agent):
-        if is_agent:
-            if relation.mean == Mean.High and relation.is_marked:
-                location = self.calculate_probability(self.marked_high_agent_mean)
-            elif relation.mean == Mean.Low and relation.is_marked:
-                location = self.calculate_probability(self.marked_low_agent_mean)
-            elif relation.mean == Mean.High and not relation.is_marked:
-                location = self.calculate_probability(self.unmarked_high_agent_mean)
-            else:
-                location = self.calculate_probability(self.unmarked_low_agent_mean)
-        else:
-            location = self.calculate_probability(self.referent_mean)
+        location = self.calculate_location_for_new_object(relation, is_agent)
         if type(relation).__name__ == Relation.North.name or type(relation).__name__ == Relation.South.name:
             self.spatial_array.itemset((location, int((self.SIZE - 1)/2)), object_to_map) 
         elif type(relation).__name__ == Relation.West.name or type(relation).__name__ == Relation.East.name:  
@@ -135,6 +125,19 @@ class MentalArrayModule:
             self.spatial_array[self.SIZE-1 - location][location] = object_to_map 
         else:
             print("UNKNONW_RELATION")
+
+    def calculate_location_for_new_object(self, relation, is_agent):
+        if is_agent:
+            if relation.mean == Mean.High and relation.is_marked:
+                return self.calculate_probability(self.marked_high_agent_mean)
+            elif relation.mean == Mean.Low and relation.is_marked:
+                return self.calculate_probability(self.marked_low_agent_mean)
+            elif relation.mean == Mean.High and not relation.is_marked:
+                return self.calculate_probability(self.unmarked_high_agent_mean)
+            else:
+                return self.calculate_probability(self.unmarked_low_agent_mean)
+        else:
+            return self.calculate_probability(self.referent_mean)
 
     def calculate_probability(self, mean):
         x = numpy.random.normal(mean, self.STANDARD_VARIATION, self.AMOUNT_OF_FIRING_EVENTS)

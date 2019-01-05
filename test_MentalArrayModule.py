@@ -58,7 +58,13 @@ class TestMentalArrayModule(unittest.TestCase):
         self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Plus, False), mental_array_module.UNMARKED_RELATION_DISTANCE)
         self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Minus, False), -1* mental_array_module.UNMARKED_RELATION_DISTANCE)
         self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Zero, False), 0)
-
+    
+    def test_calculate_location_for_new_object(self):
+        mental_array_module = self.create_mental_array_module()
+        self.assertEqual(mental_array_module.calculate_location_for_new_object(West(), True), 2)
+        self.assertEqual(mental_array_module.calculate_location_for_new_object(West(), False), 4)
+        self.assertEqual(mental_array_module.calculate_location_for_new_object(SouthEast(), True), 6)
+        self.assertEqual(mental_array_module.calculate_location_for_new_object(SouthEast(), False), 4)
 
     @patch('MentalArrayModule.MentalArrayModule.add_object_to_next_empty_cell')
     @patch('MentalArrayModule.MentalArrayModule.get_lxr_units')
