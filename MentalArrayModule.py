@@ -123,22 +123,16 @@ class MentalArrayModule:
                 location = self.calculate_probability(self.unmarked_low_agent_mean)
         else:
             location = self.calculate_probability(self.referent_mean)
-        if type(relation).__name__ == Relation.North.name:
-            self.spatial_array.itemset((location, int((self.SIZE - 1)/2)), object_to_map)
-        elif type(relation).__name__ == Relation.South.name:
-            self.spatial_array.itemset((location, int((self.SIZE -1)/2)), object_to_map)   
-        elif type(relation).__name__ == Relation.West.name:  
+        if type(relation).__name__ == Relation.North.name or type(relation).__name__ == Relation.South.name:
+            self.spatial_array.itemset((location, int((self.SIZE - 1)/2)), object_to_map) 
+        elif type(relation).__name__ == Relation.West.name or type(relation).__name__ == Relation.East.name:  
             self.spatial_array.itemset((int((self.SIZE -1)/2), location), object_to_map)
-        elif type(relation).__name__ == Relation.East.name:  
-            self.spatial_array.itemset((int((self.SIZE -1)/2), location), object_to_map) 
-        elif type(relation).__name__ == Relation.NorthWest.name: 
+        elif type(relation).__name__ == Relation.NorthWest.name or type(relation).__name__ == Relation.SouthEast.name: 
             self.spatial_array[location][location] = object_to_map 
         elif type(relation).__name__ == Relation.NorthEast.name: 
-            self.spatial_array[self.SIZE-1 - location][location] = object_to_map 
+            self.spatial_array[location][self.SIZE-1 - location] = object_to_map 
         elif type(relation).__name__ == Relation.SouthWest.name:  
             self.spatial_array[self.SIZE-1 - location][location] = object_to_map 
-        elif type(relation).__name__ == Relation.SouthEast.name:
-            self.spatial_array[location][location] = object_to_map 
         else:
             print("UNKNONW_RELATION")
 

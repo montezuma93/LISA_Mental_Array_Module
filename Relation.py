@@ -62,7 +62,7 @@ class NorthWest:
 
 class NorthEast:
     is_marked = True
-    mean = Mean.High
+    mean = Mean.Low
     agent_x_lxr_units = LxrDirection.Plus
     agent_y_lxr_units = LxrDirection.Minus
     referent_x_lxr_units = LxrDirection.Minus
