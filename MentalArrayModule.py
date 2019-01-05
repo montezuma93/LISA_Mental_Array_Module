@@ -3,6 +3,7 @@ import sys
 from scipy.stats import norm
 from Relation import *
 from pandas import *
+from prettytable import PrettyTable
 class MentalArrayModule:
 
     SIZE = 9
@@ -146,7 +147,12 @@ class MentalArrayModule:
 
 
     def print_all(self):
-        print(DataFrame(self.spatial_array))
+        x = PrettyTable()
+        x.title= "North"
+        for row in self.spatial_array:
+            x.add_row(row)
+        print(x)
+        x.print_html()
 
     def parse_input(self, input):
         arguments = input.split(" ")
