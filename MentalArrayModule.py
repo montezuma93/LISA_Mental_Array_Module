@@ -6,24 +6,25 @@ from pandas import *
 
 class MentalArrayModule:
 
-    SIZE = 9
-    MARKED_RELATION_DISTANCE = 2
-    UNMARKED_RELATION_DISTANCE = 2
     STANDARD_VARIATION = 0.5
     AMOUNT_OF_FIRING_EVENTS = 10
 
-    def __init__(self, size, marked_relation_distance, un_marked_relation_distance):
+    def __init__(self):
+        pass
+        
+    def start(self, size, unmarked_relation_distance, marked_relation_distance):
         self.objects = []
         self.SIZE = size
+        self.UNMARKED_RELATION_DISTANCE = unmarked_relation_distance
         self.MARKED_RELATION_DISTANCE = marked_relation_distance
-        self.UNMARKED_RELATION_DISTANCE = un_marked_relation_distance
         self.referent_mean = int((self.SIZE -1) /2)
         self.marked_high_agent_mean = self.referent_mean + self.MARKED_RELATION_DISTANCE
         self.unmarked_high_agent_mean = self.referent_mean + self.UNMARKED_RELATION_DISTANCE
         self.marked_low_agent_mean = self.referent_mean - self.MARKED_RELATION_DISTANCE
         self.unmarked_low_agent_mean = self.referent_mean - self.UNMARKED_RELATION_DISTANCE
         self.spatial_array = numpy.empty([self.SIZE, self.SIZE], dtype=object)
-        
+    
+
     def insert_proposition(self, relation, object1, object2):
         if self.objects.__contains__(object1) and not self.objects.__contains__(object2):
             object_was_inserted = self.add_object_by_lxr_units(relation, object1, object2, False)
@@ -169,10 +170,11 @@ if __name__ == '__main__':
     is_running = True
     args = sys.argv[1:]
     if len(args) < 3 or int(args[0]) % 2 == 0:
-        print("You need to enter an odd number as param for the size of the MAM as well as number for marked and unmarked relation distance")
+        print("You need to enter an odd number as param for the size of the MAM as well as number for unmarked and marked relation distance")
         is_running = False
     
-    mam = MentalArrayModule(int(args[0]), int(args[1]), int(args[2]))
+    mam = MentalArrayModule()
+    mam.start(int(args[0]), int(args[1]), int(args[2]))
     while is_running:
         input_var = input("Enter something: ")
         print ("you entered " + input_var)

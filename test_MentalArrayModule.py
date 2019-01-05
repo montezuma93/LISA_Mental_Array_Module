@@ -310,21 +310,23 @@ class TestMentalArrayModule(unittest.TestCase):
         self.assertEqual(mental_array_module.spatial_array[20][14], "J")
 
     def create_mental_array_module(self):
-        mental_array_module = MentalArrayModule(9, 2, 2)
+        mental_array_module = MentalArrayModule()
+        mental_array_module.start(9, 2, 2)
 
         mental_array_module.STANDARD_VARIATION = 0.0
         mental_array_module.AMOUNT_OF_FIRING_EVENTS = 10
         return mental_array_module
 
     def create_mental_array_module_with_different_settings_for_marked_and_unmarked_relations(self):
-        mental_array_module = MentalArrayModule(9, 1, 2)
-
+        mental_array_module = MentalArrayModule()
+        mental_array_module.start(9, 2, 1)
         mental_array_module.STANDARD_VARIATION = 0.0
         mental_array_module.AMOUNT_OF_FIRING_EVENTS = 10
         return mental_array_module
 
     def create_mental_array_module_with_larger_grid(self):
-        mental_array_module = MentalArrayModule(21, 3, 3)
+        mental_array_module = MentalArrayModule()
+        mental_array_module.start(21, 3, 3)
 
         mental_array_module.STANDARD_VARIATION = 0.0
         mental_array_module.AMOUNT_OF_FIRING_EVENTS = 10
