@@ -52,11 +52,11 @@ class TestMentalArrayModule(unittest.TestCase):
 
     def test_get_lxr_units(self):
         mental_array_module = self.create_mental_array_module()
-        self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Plus, True), mental_array_module.MARKED_RELATION_DISTANCE_FROM_AGENT_TO_REFERENT)
-        self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Minus, True), -1 * mental_array_module.MARKED_RELATION_DISTANCE_FROM_AGENT_TO_REFERENT)
+        self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Plus, True), mental_array_module.MARKED_RELATION_DISTANCE)
+        self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Minus, True), -1 * mental_array_module.MARKED_RELATION_DISTANCE)
         self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Zero, True), 0)
-        self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Plus, False), mental_array_module.UNMARKED_RELATION_DISTANCE_FROM_AGENT_TO_REFERENT)
-        self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Minus, False), -1* mental_array_module.UNMARKED_RELATION_DISTANCE_FROM_AGENT_TO_REFERENT)
+        self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Plus, False), mental_array_module.UNMARKED_RELATION_DISTANCE)
+        self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Minus, False), -1* mental_array_module.UNMARKED_RELATION_DISTANCE)
         self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Zero, False), 0)
 
 
@@ -304,45 +304,22 @@ class TestMentalArrayModule(unittest.TestCase):
         self.assertEqual(mental_array_module.spatial_array[20][14], "J")
 
     def create_mental_array_module(self):
-        mental_array_module = MentalArrayModule(9)
-        mental_array_module.MARKED_RELATION_DISTANCE_FROM_AGENT_TO_REFERENT = 2
-        mental_array_module.MARKED_RELATION_DISTANCE_FROM_REFERENT_TO_AGENT = 2
-        mental_array_module.UNMARKED_RELATION_DISTANCE_FROM_AGENT_TO_REFERENT = 2
-        mental_array_module.UNMARKED_RELATION_DISTANCE_FROM_REFERENT_TO_AGENT = 2
-        mental_array_module.MARKED_HIGH_AGENT_MEAN = 6
-        mental_array_module.MARKED_LOW_AGENT_MEAN = 2
-        mental_array_module.UNMARKED_HIGH_AGENT_MEAN = 6
-        mental_array_module.UNMARKED_LOW_AGENT_MEAN = 2
-        mental_array_module.REFERENT_MEAN  = 4
+        mental_array_module = MentalArrayModule(9, 2, 2)
+
         mental_array_module.STANDARD_VARIATION = 0.0
         mental_array_module.AMOUNT_OF_FIRING_EVENTS = 10
         return mental_array_module
 
     def create_mental_array_module_with_different_settings_for_marked_and_unmarked_relations(self):
-        mental_array_module = MentalArrayModule(9)
-        mental_array_module.MARKED_RELATION_DISTANCE_FROM_AGENT_TO_REFERENT = 1
-        mental_array_module.UNMARKED_RELATION_DISTANCE_FROM_AGENT_TO_REFERENT = 2
-        mental_array_module.MARKED_HIGH_AGENT_MEAN = 5
-        mental_array_module.MARKED_LOW_AGENT_MEAN = 3
-        mental_array_module.UNMARKED_HIGH_AGENT_MEAN = 6
-        mental_array_module.UNMARKED_LOW_AGENT_MEAN = 2
-        mental_array_module.REFERENT_MEAN  = 4
+        mental_array_module = MentalArrayModule(9, 1, 2)
+
         mental_array_module.STANDARD_VARIATION = 0.0
         mental_array_module.AMOUNT_OF_FIRING_EVENTS = 10
         return mental_array_module
 
     def create_mental_array_module_with_larger_grid(self):
-        mental_array_module = MentalArrayModule(21)
+        mental_array_module = MentalArrayModule(21, 3, 3)
 
-        mental_array_module.MARKED_RELATION_DISTANCE_FROM_AGENT_TO_REFERENT = 3
-        mental_array_module.MARKED_RELATION_DISTANCE_FROM_REFERENT_TO_AGENT = 3
-        mental_array_module.UNMARKED_RELATION_DISTANCE_FROM_AGENT_TO_REFERENT = 3
-        mental_array_module.UNMARKED_RELATION_DISTANCE_FROM_REFERENT_TO_AGENT = 3
-        mental_array_module.MARKED_HIGH_AGENT_MEAN = 13
-        mental_array_module.MARKED_LOW_AGENT_MEAN = 7
-        mental_array_module.UNMARKED_HIGH_AGENT_MEAN = 13
-        mental_array_module.UNMARKED_LOW_AGENT_MEAN = 7
-        mental_array_module.REFERENT_MEAN  = 10
         mental_array_module.STANDARD_VARIATION = 0.0
         mental_array_module.AMOUNT_OF_FIRING_EVENTS = 10
         return mental_array_module

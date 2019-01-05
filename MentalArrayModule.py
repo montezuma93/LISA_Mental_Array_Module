@@ -6,20 +6,22 @@ from pandas import *
 class MentalArrayModule:
 
     SIZE = 9
-    MARKED_RELATION_DISTANCE_FROM_AGENT_TO_REFERENT = 2
-    UNMARKED_RELATION_DISTANCE_FROM_AGENT_TO_REFERENT = 2
-    MARKED_HIGH_AGENT_MEAN = 6
-    MARKED_LOW_AGENT_MEAN = 2
-    UNMARKED_HIGH_AGENT_MEAN = 6
-    UNMARKED_LOW_AGENT_MEAN = 2
-    REFERENT_MEAN  = 4
+    MARKED_RELATION_DISTANCE = 2
+    UNMARKED_RELATION_DISTANCE = 2
     STANDARD_VARIATION = 0.5
     AMOUNT_OF_FIRING_EVENTS = 10
 
-    def __init__(self, size):
+    def __init__(self, size, marked_relation_distance, un_marked_relation_distance):
         self.objects = []
         self.SIZE = size
-        self.spatial_array = numpy.empty([self.SIZE, self.SIZE], dtype=object) 
+        self.MARKED_RELATION_DISTANCE = marked_relation_distance
+        self.UNMARKED_RELATION_DISTANCE = un_marked_relation_distance
+        self.referent_mean = int((self.SIZE -1) /2)
+        self.marked_high_agent_mean = self.referent_mean + self.MARKED_RELATION_DISTANCE
+        self.unmarked_high_agent_mean = self.referent_mean + self.UNMARKED_RELATION_DISTANCE
+        self.marked_low_agent_mean = self.referent_mean - self.MARKED_RELATION_DISTANCE
+        self.unmarked_low_agent_mean = self.referent_mean - self.UNMARKED_RELATION_DISTANCE
+        self.spatial_array = numpy.empty([self.SIZE, self.SIZE], dtype=object)
         
     def insert_proposition(self, relation, object1, object2):
         if self.objects.__contains__(object1) and not self.objects.__contains__(object2):
@@ -66,14 +68,14 @@ class MentalArrayModule:
     def get_lxr_units(self, lxr_direction, is_marked):
         if lxr_direction == LxrDirection.Plus:
             if is_marked:
-                return self.MARKED_RELATION_DISTANCE_FROM_AGENT_TO_REFERENT
+                return self.MARKED_RELATION_DISTANCE
             else:
-                return self.UNMARKED_RELATION_DISTANCE_FROM_AGENT_TO_REFERENT
+                return self.UNMARKED_RELATION_DISTANCE
         elif lxr_direction == LxrDirection.Minus:
             if is_marked:
-                return self.MARKED_RELATION_DISTANCE_FROM_AGENT_TO_REFERENT * -1
+                return self.MARKED_RELATION_DISTANCE * -1
             else:
-                return self.UNMARKED_RELATION_DISTANCE_FROM_AGENT_TO_REFERENT * -1
+                return self.UNMARKED_RELATION_DISTANCE * -1
         else:
             return 0
 
@@ -112,15 +114,15 @@ class MentalArrayModule:
     def fill_spatial_array_with_new_object(self, relation, object_to_map, is_agent):
         if is_agent:
             if relation.mean == Mean.High and relation.is_marked:
-                location = self.calculate_probability(self.MARKED_HIGH_AGENT_MEAN)
+                location = self.calculate_probability(self.marked_high_agent_mean)
             elif relation.mean == Mean.Low and relation.is_marked:
-                location = self.calculate_probability(self.MARKED_LOW_AGENT_MEAN)
+                location = self.calculate_probability(self.marked_low_agent_mean)
             elif relation.mean == Mean.High and not relation.is_marked:
-                location = self.calculate_probability(self.UNMARKED_HIGH_AGENT_MEAN)
+                location = self.calculate_probability(self.unmarked_high_agent_mean)
             else:
-                location = self.calculate_probability(self.UNMARKED_LOW_AGENT_MEAN)
+                location = self.calculate_probability(self.unmarked_low_agent_mean)
         else:
-            location = self.calculate_probability(self.REFERENT_MEAN)
+            location = self.calculate_probability(self.referent_mean)
         if type(relation).__name__ == Relation.North.name:
             self.spatial_array.itemset((location, int((self.SIZE - 1)/2)), object_to_map)
         elif type(relation).__name__ == Relation.South.name:
@@ -168,11 +170,11 @@ class MentalArrayModule:
 if __name__ == '__main__':
     is_running = True
     args = sys.argv[1:]
-    if len(args) < 1 or int(args[0]) % 2 == 0:
-        print("You need to enter an odd number as param for the size of the MAM")
+    if len(args) < 3 or int(args[0]) % 2 == 0:
+        print("You need to enter an odd number as param for the size of the MAM as well as number for marked and unmarked relation distance")
         is_running = False
     
-    mam = MentalArrayModule(int(args[0]))
+    mam = MentalArrayModule(int(args[0]), int(args[1]), int(args[2]))
     while is_running:
         input_var = input("Enter something: ")
         print ("you entered " + input_var)
