@@ -20,10 +20,10 @@ class TestMentalArrayModule(unittest.TestCase):
         mental_array_module.insert_proposition(north_relation, "A", "B")
         mental_array_module.insert_proposition(north_relation, "B", "C")
         mental_array_module.insert_proposition(west_relation, "D", "C")
+
         mock_add_new_object_to_spatial_array.assert_has_calls([call(north_relation, "A", True), call(north_relation, "B", False)]) 
         mock_add_object_by_reference_object_and_lxr_units.assert_has_calls([call(north_relation, "B","C", False)])
         mock_add_object_by_reference_object_and_lxr_units.assert_has_calls([call(west_relation, "C", "D", True)])     
-
 
     @patch('MentalArrayModule.MentalArrayModule.add_new_object_to_spatial_array')
     def test_mental_array_module_should_call_correct_methods_for_multiple_propositions(self, mock_add_new_object_to_spatial_array):
@@ -31,6 +31,7 @@ class TestMentalArrayModule(unittest.TestCase):
         north_relation = North()
 
         mental_array_module.insert_proposition(north_relation, "A", "B")
+
         mock_add_new_object_to_spatial_array.assert_has_calls([call(north_relation, "A", True), call(north_relation, "B", False)])   
 
     def test_calculate_new_index_with_size_9(self):
@@ -52,6 +53,7 @@ class TestMentalArrayModule(unittest.TestCase):
 
     def test_map_direction_to_lxr_units(self):
         mental_array_module = self.create_mental_array_module()
+
         self.assertEqual(mental_array_module.map_direction_to_lxr_units(Direction.Plus, True), mental_array_module.marked_distance)
         self.assertEqual(mental_array_module.map_direction_to_lxr_units(Direction.Minus, True), -1 * mental_array_module.marked_distance)
         self.assertEqual(mental_array_module.map_direction_to_lxr_units(Direction.Zero, True), 0)
@@ -61,6 +63,7 @@ class TestMentalArrayModule(unittest.TestCase):
     
     def test_calculate_location_for_new_object(self):
         mental_array_module = self.create_mental_array_module()
+
         self.assertEqual(mental_array_module.calculate_location_for_new_object(West(), True), 2)
         self.assertEqual(mental_array_module.calculate_location_for_new_object(West(), False), 4)
         self.assertEqual(mental_array_module.calculate_location_for_new_object(SouthEast(), True), 6)
@@ -97,6 +100,7 @@ class TestMentalArrayModule(unittest.TestCase):
 
     def test_normalize_lxr_units(self):
         mental_array_module = self.create_mental_array_module()
+
         self.assertEqual(mental_array_module.normalize_lxr_units(-2), -1)
         self.assertEqual(mental_array_module.normalize_lxr_units(-5), -1)
         self.assertEqual(mental_array_module.normalize_lxr_units(1), 1)
@@ -109,11 +113,12 @@ class TestMentalArrayModule(unittest.TestCase):
         south_east_relation = SouthEast()
 
         mental_array_module.add_object_by_reference_object_and_lxr_units(south_east_relation, "A", "B", True)
-        self.assertEqual(mental_array_module.spatial_array[6][6], "B")
 
+        self.assertEqual(mental_array_module.spatial_array[6][6], "B")
 
     def test_add_object_to_next_empty_cell(self):
         mental_array_module = self.create_mental_array_module()
+
         mental_array_module.spatial_array.itemset((4,4), "A")
         mental_array_module.spatial_array.itemset((5,5), "B")
         mental_array_module.spatial_array.itemset((6,6), "C")
@@ -128,6 +133,7 @@ class TestMentalArrayModule(unittest.TestCase):
         mental_array_module.spatial_array.itemset((6,6), "C")
         mental_array_module.spatial_array.itemset((7,7), "D")
         mental_array_module.spatial_array.itemset((8,8), "E")
+
         mental_array_module.add_object_to_next_empty_cell(4, 4, 2, 2, "F")
         
         self.assertFalse(mental_array_module.objects.__contains__("F"))
@@ -137,11 +143,13 @@ class TestMentalArrayModule(unittest.TestCase):
         north_relation = North()
 
         mental_array_module.insert_proposition(north_relation, "A", "B")
+
         self.assertEqual(len(mental_array_module.objects), 2)
         self.assertEqual(mental_array_module.spatial_array[2][4], "A")
         self.assertEqual(mental_array_module.spatial_array[4][4], "B")
 
     def test_mental_array_module_correctly_insert_new_proposition_for_intercardinal_direction(self):
+        # NorthWest
         mental_array_module = self.create_mental_array_module()
         north_west_relation = NorthWest()
 
@@ -151,6 +159,7 @@ class TestMentalArrayModule(unittest.TestCase):
         self.assertEqual(mental_array_module.spatial_array[2][2], "A")
         self.assertEqual(mental_array_module.spatial_array[4][4], "B")
 
+        # NorthEast
         mental_array_module = self.create_mental_array_module()
         north_east_relation = NorthEast()
 
@@ -160,6 +169,7 @@ class TestMentalArrayModule(unittest.TestCase):
         self.assertEqual(mental_array_module.spatial_array[2][6], "A")
         self.assertEqual(mental_array_module.spatial_array[4][4], "B")
 
+        # SouthEast
         mental_array_module = self.create_mental_array_module()
         south_east_relation = SouthEast()
 
@@ -169,6 +179,7 @@ class TestMentalArrayModule(unittest.TestCase):
         self.assertEqual(mental_array_module.spatial_array[6][6], "A")
         self.assertEqual(mental_array_module.spatial_array[4][4], "B")
 
+        # SouthWest
         mental_array_module = self.create_mental_array_module()
         south_west_relation = SouthWest()
 
@@ -198,12 +209,12 @@ class TestMentalArrayModule(unittest.TestCase):
         mental_array_module.insert_proposition(north_relation, "A", "B")
         mental_array_module.insert_proposition(north_relation, "B", "C")
         mental_array_module.insert_proposition(west_relation, "D", "C")
+
         self.assertEqual(len(mental_array_module.objects), 4)
         self.assertEqual(mental_array_module.spatial_array[2][4], "A")
         self.assertEqual(mental_array_module.spatial_array[4][4], "B")
         self.assertEqual(mental_array_module.spatial_array[6][4], "C")
         self.assertEqual(mental_array_module.spatial_array[6][2], "D")
-
 
     def test_mental_array_module_correctly_insert_multiple_proposition_with_intercardinal_directions(self):
         mental_array_module = self.create_mental_array_module()
@@ -216,6 +227,7 @@ class TestMentalArrayModule(unittest.TestCase):
         mental_array_module.insert_proposition(south_west_relation, "C", "B")
         mental_array_module.insert_proposition(south_east_relation, "D", "B")
         mental_array_module.insert_proposition(north_east_relation, "E", "C")
+
         self.assertEqual(len(mental_array_module.objects), 5)
         self.assertEqual(mental_array_module.spatial_array[2][2], "A")
         self.assertEqual(mental_array_module.spatial_array[4][4], "B")
@@ -223,7 +235,6 @@ class TestMentalArrayModule(unittest.TestCase):
         self.assertEqual(mental_array_module.spatial_array[6][6], "D")
         self.assertEqual(mental_array_module.spatial_array[3][5], "E")
     
-
     def test_mental_array_module_correctly_insert_other_multiple_proposition(self):
         mental_array_module = self.create_mental_array_module()
         south_relation = South()
@@ -276,7 +287,6 @@ class TestMentalArrayModule(unittest.TestCase):
         self.assertEqual(mental_array_module.spatial_array[5][1], "E")
         self.assertEqual(mental_array_module.spatial_array[4][7], "F")
         self.assertEqual(mental_array_module.spatial_array[4][8], "G")
-
 
     def test_mental_array_module_correctly_insert_multiple_proposition_with_different_settings_for_larger_grid(self):
         mental_array_module = self.create_mental_array_module_with_larger_grid()
