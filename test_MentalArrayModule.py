@@ -5,14 +5,14 @@ from MentalArrayModule import MentalArrayModule
 from Relation import *
 
 class TestMentalArrayModule(unittest.TestCase):
-
+    
     def test_mental_array_module_initialize_correctly(self):
         mental_array_module = self.create_mental_array_module()
         self.assertEqual(len(mental_array_module.objects), 0)
 
-    @patch('MentalArrayModule.MentalArrayModule.fill_spatial_array_with_new_object')
-    @patch('MentalArrayModule.MentalArrayModule.add_object_by_lxr_units')  
-    def test_mental_array_module_should_call_correct_methods_for_new_proposition(self, mock_add_object_by_lxr_units, mock_fill_spatial_array_with_new_object):
+    @patch('MentalArrayModule.MentalArrayModule.add_new_object_to_spatial_array')
+    @patch('MentalArrayModule.MentalArrayModule.add_object_by_reference_object_and_lxr_units')  
+    def test_mental_array_module_should_call_correct_methods_for_new_proposition(self, mock_add_object_by_reference_object_and_lxr_units, mock_add_new_object_to_spatial_array):
         mental_array_module = self.create_mental_array_module()
         north_relation = North()
         west_relation = West()
@@ -20,44 +20,44 @@ class TestMentalArrayModule(unittest.TestCase):
         mental_array_module.insert_proposition(north_relation, "A", "B")
         mental_array_module.insert_proposition(north_relation, "B", "C")
         mental_array_module.insert_proposition(west_relation, "D", "C")
-        mock_fill_spatial_array_with_new_object.assert_has_calls([call(north_relation, "A", True), call(north_relation, "B", False)]) 
-        mock_add_object_by_lxr_units.assert_has_calls([call(north_relation, "B","C", False)])
-        mock_add_object_by_lxr_units.assert_has_calls([call(west_relation, "C", "D", True)])     
+        mock_add_new_object_to_spatial_array.assert_has_calls([call(north_relation, "A", True), call(north_relation, "B", False)]) 
+        mock_add_object_by_reference_object_and_lxr_units.assert_has_calls([call(north_relation, "B","C", False)])
+        mock_add_object_by_reference_object_and_lxr_units.assert_has_calls([call(west_relation, "C", "D", True)])     
 
 
-    @patch('MentalArrayModule.MentalArrayModule.fill_spatial_array_with_new_object')
-    def test_mental_array_module_should_call_correct_methods_for_multiple_propositions(self, mock_fill_spatial_array_with_new_object):
+    @patch('MentalArrayModule.MentalArrayModule.add_new_object_to_spatial_array')
+    def test_mental_array_module_should_call_correct_methods_for_multiple_propositions(self, mock_add_new_object_to_spatial_array):
         mental_array_module = self.create_mental_array_module()
         north_relation = North()
 
         mental_array_module.insert_proposition(north_relation, "A", "B")
-        mock_fill_spatial_array_with_new_object.assert_has_calls([call(north_relation, "A", True), call(north_relation, "B", False)])   
+        mock_add_new_object_to_spatial_array.assert_has_calls([call(north_relation, "A", True), call(north_relation, "B", False)])   
 
-    def test_find_min_and_max_limit_with_size_9(self):
+    def test_calculate_new_index_with_size_9(self):
         mental_array_module = self.create_mental_array_module()
 
-        self.assertEqual(mental_array_module.find_min_and_max_limit(1, 7), 8)
-        self.assertEqual(mental_array_module.find_min_and_max_limit(1, 9), -1)
-        self.assertEqual(mental_array_module.find_min_and_max_limit(3, -1), 2)
-        self.assertEqual(mental_array_module.find_min_and_max_limit(1, -7), -1)
-        self.assertEqual(mental_array_module.find_min_and_max_limit(2, -2), 0)
+        self.assertEqual(mental_array_module.calculate_new_index(1, 7), 8)
+        self.assertEqual(mental_array_module.calculate_new_index(1, 9), -1)
+        self.assertEqual(mental_array_module.calculate_new_index(3, -1), 2)
+        self.assertEqual(mental_array_module.calculate_new_index(1, -7), -1)
+        self.assertEqual(mental_array_module.calculate_new_index(2, -2), 0)
 
-    def test_find_min_and_max_limit_with_larger_grid_size(self):
+    def test_calculate_new_index_with_larger_grid_size(self):
         mental_array_module = self.create_mental_array_module_with_larger_grid()
 
-        self.assertEqual(mental_array_module.find_min_and_max_limit(1, 12), 13)
-        self.assertEqual(mental_array_module.find_min_and_max_limit(0, 9), 9)
-        self.assertEqual(mental_array_module.find_min_and_max_limit(3, -8), -1)
-        self.assertEqual(mental_array_module.find_min_and_max_limit(9, -7), 2)
+        self.assertEqual(mental_array_module.calculate_new_index(1, 12), 13)
+        self.assertEqual(mental_array_module.calculate_new_index(0, 9), 9)
+        self.assertEqual(mental_array_module.calculate_new_index(3, -8), -1)
+        self.assertEqual(mental_array_module.calculate_new_index(9, -7), 2)
 
-    def test_get_lxr_units(self):
+    def test_map_direction_to_lxr_units(self):
         mental_array_module = self.create_mental_array_module()
-        self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Plus, True), mental_array_module.marked_relation_distance)
-        self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Minus, True), -1 * mental_array_module.marked_relation_distance)
-        self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Zero, True), 0)
-        self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Plus, False), mental_array_module.unmarked_relation_distance)
-        self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Minus, False), -1* mental_array_module.unmarked_relation_distance)
-        self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Zero, False), 0)
+        self.assertEqual(mental_array_module.map_direction_to_lxr_units(Direction.Plus, True), mental_array_module.marked_distance)
+        self.assertEqual(mental_array_module.map_direction_to_lxr_units(Direction.Minus, True), -1 * mental_array_module.marked_distance)
+        self.assertEqual(mental_array_module.map_direction_to_lxr_units(Direction.Zero, True), 0)
+        self.assertEqual(mental_array_module.map_direction_to_lxr_units(Direction.Plus, False), mental_array_module.unmarked_distance)
+        self.assertEqual(mental_array_module.map_direction_to_lxr_units(Direction.Minus, False), -1* mental_array_module.unmarked_distance)
+        self.assertEqual(mental_array_module.map_direction_to_lxr_units(Direction.Zero, False), 0)
     
     def test_calculate_location_for_new_object(self):
         mental_array_module = self.create_mental_array_module()
@@ -66,33 +66,42 @@ class TestMentalArrayModule(unittest.TestCase):
         self.assertEqual(mental_array_module.calculate_location_for_new_object(SouthEast(), True), 6)
         self.assertEqual(mental_array_module.calculate_location_for_new_object(SouthEast(), False), 4)
 
+    @patch('MentalArrayModule.MentalArrayModule.calculate_location_with_gaussian_distribution')
+    def test_calculate_location_for_new_object_calls_the_correct_method(self, mock_calculate_location_with_gaussian_distribution):
+        mental_array_module = self.create_mental_array_module()
+        mental_array_module.calculate_location_for_new_object(West(), True)
+        mental_array_module.calculate_location_for_new_object(West(), False)
+        mental_array_module.calculate_location_for_new_object(SouthEast(), True)
+        mental_array_module.calculate_location_for_new_object(SouthEast(), False)
+        mock_calculate_location_with_gaussian_distribution.has_calls([call(6), call(2), call(4), call(2)])
+
     @patch('MentalArrayModule.MentalArrayModule.add_object_to_next_empty_cell')
-    @patch('MentalArrayModule.MentalArrayModule.get_lxr_units')
-    @patch('MentalArrayModule.MentalArrayModule.find_min_and_max_limit')  
-    def test_add_object_by_lxr_units_without_need_look_for_next_empty_cell_has_correct_calls(self, mock_find_min_and_max_limit, mock_get_lxr_units, mock_add_object_to_next_empty_cell):
+    @patch('MentalArrayModule.MentalArrayModule.map_direction_to_lxr_units')
+    @patch('MentalArrayModule.MentalArrayModule.calculate_new_index')  
+    def test_add_object_by_lxr_units_without_need_look_for_next_empty_cell_has_correct_calls(self, mock_calculate_new_index, mock_map_direction_to_lxr_units, mock_add_object_to_next_empty_cell):
         mental_array_module = self.create_mental_array_module()
         mental_array_module.spatial_array.itemset((4,4), "A")
         south_east_relation = SouthEast()
 
-        mental_array_module.add_object_by_lxr_units(south_east_relation, "A", "B", True)
+        mental_array_module.add_object_by_reference_object_and_lxr_units(south_east_relation, "A", "B", True)
 
-        mock_get_lxr_units.assert_has_calls([call(LxrDirection.Plus, True), call(LxrDirection.Plus, True)])
-        mock_find_min_and_max_limit.assert_has_calls([call(4, mock_get_lxr_units()), call(4, mock_get_lxr_units())])
+        mock_map_direction_to_lxr_units.assert_has_calls([call(Direction.Plus, True), call(Direction.Plus, True)])
+        mock_calculate_new_index.assert_has_calls([call(4, mock_map_direction_to_lxr_units()), call(4, mock_map_direction_to_lxr_units())])
         mock_add_object_to_next_empty_cell.assert_not_called()
 
     @patch('MentalArrayModule.MentalArrayModule.add_object_to_next_empty_cell')
-    @patch('MentalArrayModule.MentalArrayModule.get_lxr_units')
-    @patch('MentalArrayModule.MentalArrayModule.find_min_and_max_limit')  
-    def test_add_object_by_lxr_units_with_need_look_for_next_empty_cell_has_correct_calls(self, mock_find_min_and_max_limit, mock_get_lxr_units, mock_add_object_to_next_empty_cell):
+    @patch('MentalArrayModule.MentalArrayModule.map_direction_to_lxr_units')
+    @patch('MentalArrayModule.MentalArrayModule.calculate_new_index')  
+    def test_add_object_by_lxr_units_with_need_look_for_next_empty_cell_has_correct_calls(self, mock_calculate_new_index, mock_map_direction_to_lxr_units, mock_add_object_to_next_empty_cell):
         mental_array_module = self.create_mental_array_module()
         mental_array_module.spatial_array.itemset((4,4), "A")
         mental_array_module.spatial_array.itemset((6,6), "B")
         south_east_relation = SouthEast()
 
-        mental_array_module.add_object_by_lxr_units(south_east_relation, "A", "C", True)
+        mental_array_module.add_object_by_reference_object_and_lxr_units(south_east_relation, "A", "C", True)
 
-        mock_get_lxr_units.assert_has_calls([call(LxrDirection.Plus, True), call(LxrDirection.Plus, True)])
-        mock_find_min_and_max_limit.assert_has_calls([call(4, mock_get_lxr_units()), call(4, mock_get_lxr_units())])
+        mock_map_direction_to_lxr_units.assert_has_calls([call(Direction.Plus, True), call(Direction.Plus, True)])
+        mock_calculate_new_index.assert_has_calls([call(4, mock_map_direction_to_lxr_units()), call(4, mock_map_direction_to_lxr_units())])
         mock_add_object_to_next_empty_cell.has_calls([call(6, 6, south_east_relation, "C", True)])
 
     def test_normalize_lxr_units(self):
@@ -108,7 +117,7 @@ class TestMentalArrayModule(unittest.TestCase):
         mental_array_module.spatial_array.itemset((4,4), "A")
         south_east_relation = SouthEast()
 
-        mental_array_module.add_object_by_lxr_units(south_east_relation, "A", "B", True)
+        mental_array_module.add_object_by_reference_object_and_lxr_units(south_east_relation, "A", "B", True)
         self.assertEqual(mental_array_module.spatial_array[6][6], "B")
 
 

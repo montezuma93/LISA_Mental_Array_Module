@@ -37,10 +37,10 @@ class MentalArrayModule:
     param5 : int
         amount of times, the gaussian distribution will choose a cell where to set an object (the lower the number the more random)
     """   
-    def start(self, size, unmarked_relation_distance, marked_relation_distance, standard_deviation, amount_of_firing_events):
+    def start(self, size, unmarked_distance, marked_distance, standard_deviation, amount_of_firing_events):
         self.size = size
-        self.unmarked_relation_distance = unmarked_relation_distance
-        self.marked_relation_distance = marked_relation_distance
+        self.unmarked_distance = unmarked_distance
+        self.marked_distance = marked_distance
         self.standard_deviation = standard_deviation
         self.amount_of_firing_times = amount_of_firing_events
 
@@ -66,18 +66,18 @@ class MentalArrayModule:
     def insert_proposition(self, relation, object1, object2):
         self.logger.info('Insert proposition with relation: %s, object1: %s, object2: %s', type(relation).__name__, object1, object2)
         if self.objects.__contains__(object1) and not self.objects.__contains__(object2):
-            object_was_inserted = self.add_object_by_lxr_units(relation, object1, object2, False)
+            object_was_inserted = self.add_object_by_reference_object_and_lxr_units(relation, object1, object2, False)
             if object_was_inserted:
                 self.objects.append(object2)
         elif self.objects.__contains__(object2) and not self.objects.__contains__(object1):
-            object_was_inserted = self.add_object_by_lxr_units(relation, object2, object1, True)
+            object_was_inserted = self.add_object_by_reference_object_and_lxr_units(relation, object2, object1, True)
             if object_was_inserted:
                 self.objects.append(object1)
         else:
             self.objects.append(object1)
             self.objects.append(object2)
-            self.fill_spatial_array_with_new_object(relation, object1, True)
-            self.fill_spatial_array_with_new_object(relation, object2, False)
+            self.add_new_object_to_spatial_array(relation, object1, True)
+            self.add_new_object_to_spatial_array(relation, object2, False)
 
     """
     Insert an object to the spatial array, based on a referent object. If it can be added in the calculated cell, returns true.
@@ -104,32 +104,28 @@ class MentalArrayModule:
     boolean
         true if the object was added, false if it wasn't possible to add it
     """ 
-    def add_object_by_lxr_units(self, relation, reference_object, object_to_add, is_agent):
+    def add_object_by_reference_object_and_lxr_units(self, relation, reference_object, object_to_add, is_agent):
         reference_object_itemindex = numpy.where(self.spatial_array==reference_object)
-        object_to_add_index_x = reference_object_itemindex[1][0]
-        object_to_add_index_y = reference_object_itemindex[0][0]
-        lxr_x_direction = 0
-        lxr_y_direction = 0
+        lxr_units_in_x_direction = 0
+        lxr_units_in_y_direction = 0
         if is_agent:
-            lxr_x_direction = self.get_lxr_units(relation.agent_x_lxr_units, relation.is_marked)
-            lxr_y_direction = self.get_lxr_units(relation.agent_y_lxr_units, relation.is_marked)
-            object_to_add_index_y = self.find_min_and_max_limit(reference_object_itemindex[0][0], lxr_y_direction)
-            object_to_add_index_x = self.find_min_and_max_limit(reference_object_itemindex[1][0] , lxr_x_direction)
+            lxr_units_in_x_direction = self.map_direction_to_lxr_units(relation.agent_x_direction, relation.is_marked)
+            lxr_units_in_y_direction = self.map_direction_to_lxr_units(relation.agent_y_direction, relation.is_marked)
         else:
-            lxr_x_direction = self.get_lxr_units(relation.referent_x_lxr_units, relation.is_marked)
-            lxr_y_direction = self.get_lxr_units(relation.referent_y_lxr_units, relation.is_marked)
-            object_to_add_index_y = self.find_min_and_max_limit(reference_object_itemindex[0][0], lxr_y_direction)
-            object_to_add_index_x = self.find_min_and_max_limit(reference_object_itemindex[1][0], lxr_x_direction)
-        if object_to_add_index_y == -1 or object_to_add_index_x == -1:
+            lxr_units_in_x_direction = self.map_direction_to_lxr_units(relation.referent_x_direction, relation.is_marked)
+            lxr_units_in_y_direction = self.map_direction_to_lxr_units(relation.referent_y_direction, relation.is_marked)
+        calculated_index_y = self.calculate_new_index(reference_object_itemindex[0][0], lxr_units_in_y_direction)
+        calculated_index_x = self.calculate_new_index(reference_object_itemindex[1][0] , lxr_units_in_x_direction)
+        if calculated_index_y == -1 or calculated_index_x == -1:
             self.logger.info("No space found for the object: %s", object_to_add)
             return False
-        next_item = self.spatial_array.item((object_to_add_index_y, object_to_add_index_x))
-        if next_item is not None:
-            object_was_inserted = self.add_object_to_next_empty_cell(object_to_add_index_x, object_to_add_index_y, lxr_x_direction, lxr_y_direction, object_to_add)
+        calculated_item = self.spatial_array.item((calculated_index_y, calculated_index_x))
+        if calculated_item is not None:
+            object_was_inserted = self.add_object_to_next_empty_cell(calculated_index_x, calculated_index_y, lxr_units_in_x_direction, lxr_units_in_y_direction, object_to_add)
             return object_was_inserted
         else:
-            self.logger.info("Added object: %s in spatial array in cell [%s] [%s] ", object_to_add, object_to_add_index_y, object_to_add_index_x)
-            self.spatial_array.itemset((object_to_add_index_y, object_to_add_index_x), object_to_add)
+            self.logger.info("Added object: %s in spatial array in cell [%s] [%s] ", object_to_add, calculated_index_y, calculated_index_x)
+            self.spatial_array.itemset((calculated_index_y, calculated_index_x), object_to_add)
             return True
 
     """
@@ -148,19 +144,41 @@ class MentalArrayModule:
     int
         amount in the direction
     """ 
-    def get_lxr_units(self, lxr_direction, is_marked):
-        if lxr_direction == LxrDirection.Plus:
+    def map_direction_to_lxr_units(self, direction, is_marked):
+        if direction == Direction.Plus:
             if is_marked:
-                return self.marked_relation_distance
+                return self.marked_distance
             else:
-                return self.unmarked_relation_distance
-        elif lxr_direction == LxrDirection.Minus:
+                return self.unmarked_distance
+        elif direction == Direction.Minus:
             if is_marked:
-                return self.marked_relation_distance * -1
+                return self.marked_distance * -1
             else:
-                return self.unmarked_relation_distance * -1
+                return self.unmarked_distance * -1
         else:
             return 0
+
+    """
+    Calculate the next index based on index plus direction. Checks whether the new index is outside of the grid
+    
+    Parameters
+    ----------
+    param1 : int
+        index from which the lxr units get added
+    
+    param2 : int
+        lxr units to add
+    
+    Returns
+    --------
+    int
+        returns the new index, returns -1 if it was outside of the grid
+    """ 
+    def calculate_new_index(self, index, index_to_add):
+        if index + index_to_add >= self.size or index + index_to_add < 0:
+            return -1
+        else:
+            return index + index_to_add
 
     """
     Look for next empty cell to add object. This method was called cause cell was already blocked by another object
@@ -188,21 +206,18 @@ class MentalArrayModule:
         true if the object was added, false if the object wasn't able to get added
     """ 
     def add_object_to_next_empty_cell(self, index_x, index_y, direction_x, direction_y, object_to_add):
-        new_index_y = index_y
-        new_index_x = index_x
         normalized_x_direction = self.normalize_lxr_units(direction_x)
         normalized_y_direction = self.normalize_lxr_units(direction_y)
-
-        next_item = ""
-        while next_item is not None:
-            new_index_y = self.find_min_and_max_limit(new_index_y, normalized_y_direction)
-            new_index_x = self.find_min_and_max_limit(new_index_x , normalized_x_direction)
-            if new_index_y == -1 or new_index_x == -1:
+        calculated_item = ""
+        while calculated_item is not None:
+            index_y = self.calculate_new_index(index_y, normalized_y_direction)
+            index_x = self.calculate_new_index(index_x , normalized_x_direction)
+            if index_y == -1 or index_x == -1:
                 self.logger.info("No space found for the object: %s. Not possible to add it to spatial array", object_to_add)
                 return False
-            next_item = self.spatial_array.item((new_index_y, new_index_x))
-        self.spatial_array.itemset((new_index_y, new_index_x), object_to_add)
-        self.logger.info("Object: %s was added in cell [%s][%s] in the spatial array", object_to_add, new_index_y, new_index_x)
+            calculated_item = self.spatial_array.item((index_y, index_x))
+        self.spatial_array.itemset((index_y, index_x), object_to_add)
+        self.logger.info("Object: %s was added in cell [%s][%s] in the spatial array", object_to_add, index_y, index_x)
         return True
 
     """
@@ -225,28 +240,6 @@ class MentalArrayModule:
             return -1
         else:
             return 0
-    
-    """
-    Calculate the next index based on index plus direction. Checks whether the new index is outside of the grid
-    
-    Parameters
-    ----------
-    param1 : int
-        index from which the lxr units get added
-    
-    param2 : int
-        lxr units to add
-    
-    Returns
-    --------
-    int
-        returns the new index, returns -1 if it was outside of the grid
-    """ 
-    def find_min_and_max_limit(self, index, index_to_add):
-        if index + index_to_add >= self.size or index + index_to_add < 0:
-            return -1
-        else:
-            return index + index_to_add
 
     """
     Fill a new object to the grid, if none of the objects of an relation were already in the grid
@@ -263,18 +256,18 @@ class MentalArrayModule:
         true if the object to add is the agent of the relation, false if it is the referent
     
     """ 
-    def fill_spatial_array_with_new_object(self, relation, object_to_map, is_agent):
+    def add_new_object_to_spatial_array(self, relation, object_to_add, is_agent):
         location = self.calculate_location_for_new_object(relation, is_agent)
         if type(relation).__name__ == Relation.North.name or type(relation).__name__ == Relation.South.name:
-            self.spatial_array.itemset((location, int((self.size - 1)/2)), object_to_map) 
+            self.spatial_array.itemset((location, int((self.size - 1)/2)), object_to_add) 
         elif type(relation).__name__ == Relation.West.name or type(relation).__name__ == Relation.East.name:  
-            self.spatial_array.itemset((int((self.size -1)/2), location), object_to_map)
+            self.spatial_array.itemset((int((self.size -1)/2), location), object_to_add)
         elif type(relation).__name__ == Relation.NorthWest.name or type(relation).__name__ == Relation.SouthEast.name: 
-            self.spatial_array[location][location] = object_to_map 
+            self.spatial_array[location][location] = object_to_add 
         elif type(relation).__name__ == Relation.NorthEast.name: 
-            self.spatial_array[location][self.size-1 - location] = object_to_map 
+            self.spatial_array[location][self.size-1 - location] = object_to_add 
         elif type(relation).__name__ == Relation.SouthWest.name:  
-            self.spatial_array[self.size-1 - location][location] = object_to_map
+            self.spatial_array[self.size-1 - location][location] = object_to_add
 
     """
     Calculate the location of an new object based on its relation or if the object is agent of the relation
@@ -286,8 +279,7 @@ class MentalArrayModule:
 
     param2 : boolean
         true if the object to add is the agent of the relation, false if it is the referent
-    
-        
+  
     Returns
     --------
     int
@@ -297,15 +289,15 @@ class MentalArrayModule:
         referent_mean = int((self.size -1) /2)
         if is_agent:
             if relation.mean == Mean.High and relation.is_marked:
-                return self.calculate_probability(referent_mean + self.marked_relation_distance)
+                return self.calculate_location_with_gaussian_distribution(referent_mean + self.marked_distance)
             elif relation.mean == Mean.Low and relation.is_marked:
-                return self.calculate_probability(referent_mean - self.marked_relation_distance)
+                return self.calculate_location_with_gaussian_distribution(referent_mean - self.marked_distance)
             elif relation.mean == Mean.High and not relation.is_marked:
-                return self.calculate_probability(referent_mean + self.unmarked_relation_distance)
+                return self.calculate_location_with_gaussian_distribution(referent_mean + self.unmarked_distance)
             else:
-                return self.calculate_probability(referent_mean - self.unmarked_relation_distance)
+                return self.calculate_location_with_gaussian_distribution(referent_mean - self.unmarked_distance)
         else:
-            return self.calculate_probability(referent_mean)
+            return self.calculate_location_with_gaussian_distribution(referent_mean)
 
     """
     Calculate the cell where to put the element which should get added
@@ -325,7 +317,7 @@ class MentalArrayModule:
     int
         the cell where the object get placed
     """ 
-    def calculate_probability(self, mean):
+    def calculate_location_with_gaussian_distribution(self, mean):
         x = numpy.random.normal(mean, self.standard_deviation, self.amount_of_firing_times)
         mean = numpy.mean(x)
         return int(round(mean))
