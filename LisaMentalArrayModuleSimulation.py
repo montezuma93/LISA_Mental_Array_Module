@@ -25,7 +25,7 @@ def start_simulation():
     size = int(req_data['size'])
     unmarked_distance = int(req_data['unmarkedDistance'])
     marked_distance = int(req_data['markedDistance'])
-    standard_deviation = int(req_data['standardDeviation'])
+    standard_deviation = float(req_data['standardDeviation'])
     amount_of_firing_events = int(req_data['amountOfFiringEvents'])
     lisa_mental_array_module_simulation.start(size, unmarked_distance, marked_distance, standard_deviation, amount_of_firing_events)
     propositions = req_data['propositions']
