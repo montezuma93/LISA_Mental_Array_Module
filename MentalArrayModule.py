@@ -5,15 +5,13 @@ from Relation import *
 from pandas import *
 
 class MentalArrayModule:
-
-    STANDARD_VARIATION = 0.5
-    AMOUNT_OF_FIRING_EVENTS = 10
-
     def __init__(self):
         pass
         
-    def start(self, size, unmarked_relation_distance, marked_relation_distance):
+    def start(self, size, unmarked_relation_distance, marked_relation_distance, standard_deviation, amount_of_firing_events):
         self.objects = []
+        self.STANDARD_DEVIATION = standard_deviation
+        self.AMOUNT_OF_FIRING_EVENTS = amount_of_firing_events
         self.SIZE = size
         self.UNMARKED_RELATION_DISTANCE = unmarked_relation_distance
         self.MARKED_RELATION_DISTANCE = marked_relation_distance
@@ -142,13 +140,20 @@ class MentalArrayModule:
             return self.calculate_probability(self.referent_mean)
 
     def calculate_probability(self, mean):
-        x = numpy.random.normal(mean, self.STANDARD_VARIATION, self.AMOUNT_OF_FIRING_EVENTS)
+        x = numpy.random.normal(mean, self.STANDARD_DEVIATION, self.AMOUNT_OF_FIRING_EVENTS)
         mean = numpy.mean(x)
         return int(round(mean))
 
 
     def print_all(self):
         print(self.spatial_array)
+
+    def get_spatial_array(self):
+        spatial_array = self.spatial_array.tolist()
+        return {
+            "spatial_array": spatial_array
+        }
+
 
     def parse_input(self, input):
         arguments = input.split(" ")
@@ -174,7 +179,7 @@ if __name__ == '__main__':
         is_running = False
     
     mam = MentalArrayModule()
-    mam.start(int(args[0]), int(args[1]), int(args[2]))
+    mam.start(int(args[0]), int(args[1]), int(args[2]), 0.5, 10)
     while is_running:
         input_var = input("Enter something: ")
         print ("you entered " + input_var)

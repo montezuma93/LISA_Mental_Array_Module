@@ -1,24 +1,30 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import Select from '@material-ui/core/Select';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
 
 class SpatialArray extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-    };
-  }
 
   render() {
     return (
-      <div>
+      <div >
+        <table style={{align:"center", marginTop:"4rem"}}>{this.createTable()}</table>
       </div>
     );
   }
-
-
+    
+  createTable = () => {
+    let table = []
+    for (let i = 0; i < this.props.spatialArray.length; i++) {
+      let children = []
+      for (let j = 0; j < this.props.spatialArray[i].length; j++) {
+        if (this.props.spatialArray[i][j] == null){
+          children.push(<td style={{"borderStyle":'solid', "borderWidth":0.5, width:'3rem', height:'3rem'}}></td>)
+        } else {
+          children.push(<td style={{"borderStyle":'solid', "borderWidth":0.5, width:'3rem', height:'3rem'}}>{this.props.spatialArray[i][j]}</td>)
+        }
+      }
+      table.push(<tr style={{"borderStyle":'solid', "borderWidth":0.5}}>{children}</tr>)
+    }
+    return table
+  }
 }
 
 export default SpatialArray;
