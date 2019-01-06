@@ -15,7 +15,6 @@ class MentalArrayModule:
         self.logger.setLevel(logging.INFO)
         stream_handler = logging.StreamHandler()
         self.logger.addHandler(stream_handler)
-        pass
 
     """
     Initialize a new mental array module
