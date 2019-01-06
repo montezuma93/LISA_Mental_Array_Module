@@ -52,11 +52,11 @@ class TestMentalArrayModule(unittest.TestCase):
 
     def test_get_lxr_units(self):
         mental_array_module = self.create_mental_array_module()
-        self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Plus, True), mental_array_module.MARKED_RELATION_DISTANCE)
-        self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Minus, True), -1 * mental_array_module.MARKED_RELATION_DISTANCE)
+        self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Plus, True), mental_array_module.marked_relation_distance)
+        self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Minus, True), -1 * mental_array_module.marked_relation_distance)
         self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Zero, True), 0)
-        self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Plus, False), mental_array_module.UNMARKED_RELATION_DISTANCE)
-        self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Minus, False), -1* mental_array_module.UNMARKED_RELATION_DISTANCE)
+        self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Plus, False), mental_array_module.unmarked_relation_distance)
+        self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Minus, False), -1* mental_array_module.unmarked_relation_distance)
         self.assertEqual(mental_array_module.get_lxr_units(LxrDirection.Zero, False), 0)
     
     def test_calculate_location_for_new_object(self):
