@@ -66,15 +66,6 @@ class TestMentalArrayModule(unittest.TestCase):
         self.assertEqual(mental_array_module.calculate_location_for_new_object(SouthEast(), True), 6)
         self.assertEqual(mental_array_module.calculate_location_for_new_object(SouthEast(), False), 4)
 
-    @patch('MentalArrayModule.MentalArrayModule.calculate_location_with_gaussian_distribution')
-    def test_calculate_location_for_new_object_calls_the_correct_method(self, mock_calculate_location_with_gaussian_distribution):
-        mental_array_module = self.create_mental_array_module()
-        mental_array_module.calculate_location_for_new_object(West(), True)
-        mental_array_module.calculate_location_for_new_object(West(), False)
-        mental_array_module.calculate_location_for_new_object(SouthEast(), True)
-        mental_array_module.calculate_location_for_new_object(SouthEast(), False)
-        mock_calculate_location_with_gaussian_distribution.has_calls([call(6), call(2), call(4), call(2)])
-
     @patch('MentalArrayModule.MentalArrayModule.add_object_to_next_empty_cell')
     @patch('MentalArrayModule.MentalArrayModule.map_direction_to_lxr_units')
     @patch('MentalArrayModule.MentalArrayModule.calculate_new_index')  
