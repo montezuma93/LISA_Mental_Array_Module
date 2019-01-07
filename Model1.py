@@ -87,7 +87,7 @@ def run(item):
 
 
 """
-Uses vector angle to choose closest direction
+Returns all cardinal direction (inclusive inter cardinal directions) (marked and unmarked distance is the same) (no random)
 """
 class Model1(ccobra.CCobraModel):
 

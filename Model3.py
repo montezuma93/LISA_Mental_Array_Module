@@ -24,12 +24,13 @@ def cast_relation(relation):
     return dictionary.get(relation,'Relation Not Found')
 
 def cast_relation_back(relation):
-    dictionary = {'North': 'north', 'South':'south', 'West': 'west', 'East': 'east'}
+    dictionary = {'North': 'north', 'South':'south', 'West': 'west', 'East': 'east' ,
+    'NorthEast': 'north-east', 'NorthWest': 'north-west', 'SouthEast': 'south-east', 'SouthWest': 'south-west'}
     return dictionary.get(relation,'Relation Not Found')
 
 
 def create_simulation_response_string(spatial_array, object1, object2):
-    vector_to_relation_mapping_dict = {'North': (1,0), 'South': (-1,0),'West': (0,1), 'East': (0,-1)}
+    vector_to_relation_mapping_dict = {'North': (1,0), 'South': (-1,0),'West': (0,1), 'East': (0,-1), 'NorthEast': (1,-1), 'NorthWest': (1,1), 'SouthEast': (-1,-1), 'SouthWest': (-1,1)}
     spatial_array_as_matrix = numpy.matrix(spatial_array)
     object1_itemindex = numpy.where(spatial_array_as_matrix==object1)
     object2_itemindex = numpy.where(spatial_array_as_matrix==object2)
@@ -67,8 +68,8 @@ def run(item):
         "size": "9",
         "unmarkedDistance": "2",
         "markedDistance": "2",
-        "standardDeviation": "0.0",
-        "amountOfFiringEvents": "10"
+        "standardDeviation": "0.5",
+        "amountOfFiringEvents": "5"
     }
 
     propositions_to_save_json = json.dumps(propositions_to_save_data)
@@ -86,12 +87,12 @@ def run(item):
 
 
 """
-Always returns main cardinal directions (marked and unmarked distance is the same) (no random)
+Returns all cardinal direction (inclusive inter cardinal directions) (marked and unmarked distance is the same) (with random)
 """
-class Model2(ccobra.CCobraModel):
+class Model3(ccobra.CCobraModel):
 
-    def __init__(self, name='Model2'):
-        super(Model2, self).__init__(name, ['relational'], ['verify', 'single_choice'])
+    def __init__(self, name='Model3'):
+        super(Model3, self).__init__(name, ['relational'], ['verify', 'single_choice'])
 
     def predict(self, item, **kwargs):
         return run(item)
