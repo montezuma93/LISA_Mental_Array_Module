@@ -242,6 +242,7 @@ class MentalArrayModule:
 
     """
     Fill a new object to the grid, if none of the objects of an relation were already in the grid
+    If it is already blocked, random again
     
     Parameters
     ----------
@@ -254,19 +255,36 @@ class MentalArrayModule:
     param3 : boolean
         true if the object to add is the agent of the relation, false if it is the referent
     
-    """ 
+    """
     def add_new_object_to_spatial_array(self, relation, object_to_add, is_agent):
-        location = self.calculate_location_for_new_object(relation, is_agent)
-        if type(relation).__name__ == Relation.North.name or type(relation).__name__ == Relation.South.name:
-            self.spatial_array.itemset((location, int((self.size - 1)/2)), object_to_add) 
-        elif type(relation).__name__ == Relation.West.name or type(relation).__name__ == Relation.East.name:  
-            self.spatial_array.itemset((int((self.size -1)/2), location), object_to_add)
-        elif type(relation).__name__ == Relation.NorthWest.name or type(relation).__name__ == Relation.SouthEast.name: 
-            self.spatial_array[location][location] = object_to_add 
-        elif type(relation).__name__ == Relation.NorthEast.name: 
-            self.spatial_array[location][self.size-1 - location] = object_to_add 
-        elif type(relation).__name__ == Relation.SouthWest.name:  
-            self.spatial_array[self.size-1 - location][location] = object_to_add
+        object_was_added = False
+        while not object_was_added:
+            location = self.calculate_location_for_new_object(relation, is_agent)
+            if type(relation).__name__ == Relation.North.name or type(relation).__name__ == Relation.South.name:
+                if self.spatial_array[location][int((self.size - 1)/2)] == None:
+                    self.spatial_array.itemset((location, int((self.size - 1)/2)), object_to_add)
+                    self.logger.info("Object: %s was added in cell [%s][%s] in the spatial array", object_to_add, location, int((self.size - 1)/2))
+                    object_was_added = True
+            elif type(relation).__name__ == Relation.West.name or type(relation).__name__ == Relation.East.name:
+                if self.spatial_array[int((self.size - 1)/2)][location] == None:
+                    self.spatial_array.itemset((int((self.size -1)/2), location), object_to_add)
+                    self.logger.info("Object: %s was added in cell [%s][%s] in the spatial array", object_to_add, int((self.size - 1)/2), location)
+                    object_was_added = True
+            elif type(relation).__name__ == Relation.NorthWest.name or type(relation).__name__ == Relation.SouthEast.name:
+                if self.spatial_array[location][location] == None:
+                    self.spatial_array[location][location] = object_to_add
+                    self.logger.info("Object: %s was added in cell [%s][%s] in the spatial array", object_to_add, location, location)
+                    object_was_added = True
+            elif type(relation).__name__ == Relation.NorthEast.name:
+                if self.spatial_array[location][self.size-1 - location] == None:
+                    self.spatial_array[location][self.size-1 - location] = object_to_add
+                    self.logger.info("Object: %s was added in cell [%s][%s] in the spatial array", object_to_add, location, self.size-1 - location)
+                    object_was_added = True
+            elif type(relation).__name__ == Relation.SouthWest.name: 
+                if self.spatial_array[self.size-1 - location][location] == None:
+                    self.spatial_array[self.size-1 - location][location] = object_to_add
+                    self.logger.info("Object: %s was added in cell [%s][%s] in the spatial array", object_to_add, self.size-1 - location, location)
+                    object_was_added = True
 
     """
     Calculate the location of an new object based on its relation or if the object is agent of the relation

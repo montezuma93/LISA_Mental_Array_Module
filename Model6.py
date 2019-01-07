@@ -89,10 +89,10 @@ def run(item):
 """
 Returns all cardinal direction (inclusive inter cardinal directions) (marked and unmarked distance is not the same) (with random)
 """
-class Model4(ccobra.CCobraModel):
+class Model6(ccobra.CCobraModel):
 
-    def __init__(self, name='Model4'):
-        super(Model4, self).__init__(name, ['relational'], ['verify', 'single_choice'])
+    def __init__(self, name='Model6'):
+        super(Model6, self).__init__(name, ['relational'], ['verify', 'single_choice'])
 
     def predict(self, item, **kwargs):
         return run(item)
