@@ -280,7 +280,7 @@ class MentalArrayModule:
                     self.spatial_array[location][self.size-1 - location] = object_to_add
                     self.logger.info("Object: %s was added in cell [%s][%s] in the spatial array", object_to_add, location, self.size-1 - location)
                     object_was_added = True
-            elif type(relation).__name__ == Relation.SouthWest.name: 
+            else:
                 if self.spatial_array[self.size-1 - location][location] == None:
                     self.spatial_array[self.size-1 - location][location] = object_to_add
                     self.logger.info("Object: %s was added in cell [%s][%s] in the spatial array", object_to_add, self.size-1 - location, location)
