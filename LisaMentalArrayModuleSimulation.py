@@ -1,5 +1,5 @@
 from MentalArrayModule import MentalArrayModule
-from Relation import North, West, South, East, NorthEast, NorthWest, SouthEast, SouthWest
+from Relation import North, West, South, East, NorthEast, NorthWest, SouthEast, SouthWest, Left, Right
 import json
 from flask import Flask, request, json
 from flask_restplus import Resource, Api, reqparse, Swagger,fields
@@ -38,7 +38,8 @@ def start_simulation():
 
 def cast_relation(relation):
     dictionary = {'North':North(), 'South':South(), 'West':West(), 'East': East(),
-       'NorthEast': NorthEast(), 'NorthWest': NorthWest(), 'SouthEast': SouthEast(), 'SouthWest': SouthWest()}
+       'NorthEast': NorthEast(), 'NorthWest': NorthWest(), 'SouthEast': SouthEast(), 'SouthWest': SouthWest(),
+       'Left': Left(), 'Right': Right()}
     return dictionary.get(relation,'Relation Not Found')
 
 lisa_mental_array_module_simulation = LisaMentalArrayModuleSimulation(app)

@@ -265,7 +265,8 @@ class MentalArrayModule:
             if type(relation).__name__ == Relation.North.name or type(relation).__name__ == Relation.South.name:
                 index_x = int((self.size - 1)/2)
                 index_y = location
-            elif type(relation).__name__ == Relation.West.name or type(relation).__name__ == Relation.East.name:
+            elif (type(relation).__name__ == Relation.West.name or type(relation).__name__ == Relation.East.name 
+             or type(relation).__name__ == Relation.Left.name or type(relation).__name__ == Relation.Right.name):
                 index_x = location
                 index_y = int((self.size - 1)/2)
             elif type(relation).__name__ == Relation.NorthWest.name or type(relation).__name__ == Relation.SouthEast.name:

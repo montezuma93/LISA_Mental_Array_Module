@@ -9,6 +9,8 @@ class Relation(Enum):
     NorthEast = "NorthEast"
     SouthWest = "SouthWest"
     SouthEast = "SouthEast"
+    Left = "Left"
+    Right = "Right"
 
 class Mean(Enum):
     High = "High"
@@ -84,3 +86,18 @@ class SouthEast:
     referent_x_direction = Direction.Minus
     referent_y_direction = Direction.Minus
 
+class Left:
+    is_marked = False
+    mean = Mean.Low
+    agent_x_direction = Direction.Minus
+    agent_y_direction = Direction.Zero
+    referent_x_direction = Direction.Plus
+    referent_y_direction = Direction.Zero
+
+class Right:
+    is_marked = False
+    mean = Mean.High
+    agent_x_direction = Direction.Plus
+    agent_y_direction = Direction.Zero
+    referent_x_direction = Direction.Minus
+    referent_y_direction = Direction.Zero

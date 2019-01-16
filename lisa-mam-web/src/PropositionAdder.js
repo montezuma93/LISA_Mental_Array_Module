@@ -14,7 +14,7 @@ class PropositionAdder extends React.Component {
   }
 
   static defaultProps = {
-    relations: ['South', 'North', 'East', 'West', 'NorthWest', 'NorthEast', 'SouthWest', 'SouthEast'],
+    relations: ['South', 'North', 'East', 'West', 'NorthWest', 'NorthEast', 'SouthWest', 'SouthEast', 'Left', 'Right']
   }
 
   render() {
