@@ -18,7 +18,7 @@ class SpatialArray extends React.Component {
         if (this.props.spatialArray[i][j] == null){
           children.push(<td style={{"borderStyle":'solid', "borderWidth":0.5, width:'3rem', height:'3rem'}}></td>)
         } else {
-          children.push(<td style={{"borderStyle":'solid', "borderWidth":0.5, width:'3rem', height:'3rem'}}>{this.props.spatialArray[i][j]}</td>)
+          children.push(<td style={{"borderStyle":'solid', "borderWidth":0.5, width:'3rem', height:'3rem', "text-align": 'center', "vertical-align": 'middle'}}>{this.props.spatialArray[i][j]}</td>)
         }
       }
       table.push(<tr style={{"borderStyle":'solid', "borderWidth":0.5}}>{children}</tr>)
