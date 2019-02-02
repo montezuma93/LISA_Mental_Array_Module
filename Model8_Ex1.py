@@ -91,7 +91,7 @@ Returns all cardinal direction (inclusive inter cardinal directions) (marked and
 """
 class Model8(ccobra.CCobraModel):
 
-    def __init__(self, name='Model('):
+    def __init__(self, name='Model8'):
         super(Model8, self).__init__(name, ['relational'], ['verify', 'single_choice'])
 
     def predict(self, item, **kwargs):
