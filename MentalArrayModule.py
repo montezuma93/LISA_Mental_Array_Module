@@ -1,9 +1,7 @@
 import numpy
-import sys
 from scipy.stats import norm
 import logging
 from Relation import *
-from pandas import *
 
 class MentalArrayModule:
 
